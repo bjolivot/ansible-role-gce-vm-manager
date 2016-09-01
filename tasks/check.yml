@@ -1,0 +1,23 @@
+---
+# here comes env checking
+
+- name: Check vars defined
+  debug: msg="Cheking {{ item | mandatory  }} "
+  tags: check
+  with_items:
+    - gce_service_account_email
+    - gce_pem_file
+    - gce_project_id
+    - gce_region
+    - gce_zone
+
+- name: check pem file is present
+  local_action: stat path="{{playbook_dir}}/{{gce_pem_file}}"
+  register: pem_file_stat
+  ignore_errors: True
+  tags: check
+
+- fail: msg="Pem file {{ gce_pem_file }} not found in playbook directory"
+  when: pem_file_stat.stat.exists == false
+  tags: check
+

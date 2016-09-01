@@ -1,0 +1,43 @@
+---
+- name: Create VM HDDs
+  local_action: 
+    module: gce_pd 
+    name: "{{item.key}}-hdd" 
+    size_gb: {{ item.value.hdd }} 
+    zone: {{ gce_zone }} 
+    service_account_email: {{ gce_service_account_email }} 
+    pem_file: {{ gce_pem_file }} 
+    project_id: {{ gce_project_id }} 
+    image: {{item.value.image}} 
+    state: "active"
+  with_dict: "{{ gce_vm_list }}"
+  tags: vm,hdd
+
+- name: Launch instances
+  local_action: 
+    module: gce 
+    instance_names: {{item.key}} 
+    machine_type: "{{item.value.type}}" 
+    disks: "{{ item.key }}-hdd" 
+    zone: "{{gce_zone}}" 
+    service_account_email: "{{ gce_service_account_email }}" 
+    pem_file: "{{ gce_pem_file }}" 
+    project_id: "{{ gce_project_id }}" 
+    tags: "{{ item.value.group }}" 
+    state: "active"
+  register: gceinventory
+  with_dict: "{{ gce_vm_list }}"
+  tags: vm,launch
+
+- name: add tags to instances
+  local_action: 
+    module: gce_tag 
+    instance_name: "{{ item.key }}" 
+    tags: "{{item.value.tags}}"
+    zone: "{{ vm_zone }}" 
+    state: present 
+    service_account_email: "{{ gce_service_account_email }}" 
+    pem_file: "{{ gce_pem_file }}" 
+    project_id: "{{ gce_project_id }}"
+  with_dict: "{{ gce_vm_list }}"
+  tags: vm,tag
