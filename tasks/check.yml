@@ -1,15 +1,16 @@
 ---
 # here comes env checking
 
-- name: Check vars defined
-  debug: msg="Cheking {{ item | mandatory  }} "
-  tags: check
-  with_items:
+
+- fail: msg="Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items: 
     - gce_service_account_email
     - gce_pem_file
     - gce_project_id
     - gce_region
     - gce_zone
+
 
 - name: check pem file is present
   local_action: stat path="{{playbook_dir}}/{{gce_pem_file}}"
