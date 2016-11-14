@@ -14,6 +14,7 @@
 
 - name: check pem file is present
   local_action: stat path="{{playbook_dir}}/{{gce_pem_file}}"
+  become: false
   register: pem_file_stat
   ignore_errors: True
   tags: check

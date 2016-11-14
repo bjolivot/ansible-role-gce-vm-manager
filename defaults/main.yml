@@ -4,3 +4,4 @@
 # #myvar is used to do something great
 # myvar: value
 #
+gce_zone: "europe-west1-d"
